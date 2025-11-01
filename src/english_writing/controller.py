@@ -1,13 +1,17 @@
 import random
 from datetime import datetime
 
-from service import QuestionService, FeedbackService
+from .service import QuestionService, FeedbackService
 from typing import Optional
 import json
 
 
 class AppController:
-    def __init__(self, question_service: QuestionService, feedback_service: Optional[FeedbackService] = None):
+    def __init__(
+        self,
+        question_service: QuestionService,
+        feedback_service: Optional[FeedbackService] = None,
+    ):
         self.question_service = question_service
         self.feedback_service = feedback_service
         self._questions = []
@@ -28,17 +32,17 @@ class AppController:
             self._memos = self._load_memos("memo.json")
 
         if self._memos:
-            return random.choice(self._memos)['memo']
+            return random.choice(self._memos)["memo"]
         return None
 
     def _load_memos(self, filepath: str) -> list:
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, "r", encoding="utf-8") as f:
                 return json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             return []
 
-    def process_answer_and_get_feedback(self, question: str, answer: str) -> (str | None):
+    def process_answer_and_get_feedback(self, question: str, answer: str) -> str | None:
         if not self.feedback_service:
             print("오류: FeedbackService가 설정되지 않았습니다.")
             return "피드백 서비스를 설정해주세요."
@@ -56,21 +60,29 @@ class AppController:
 
     def _save_feedback(self, question: str, answer: str, feedback: str):
         try:
-            with open('feedback_history.json', 'r+') as f:
+            with open("feedback_history.json", "r+") as f:
                 history = json.load(f)
-                history.append({
-                    "question": question,
-                    "answer": answer,
-                    "feedback": feedback,
-                    "timestamp": str(datetime.now())
-                })
+                history.append(
+                    {
+                        "question": question,
+                        "answer": answer,
+                        "feedback": feedback,
+                        "timestamp": str(datetime.now()),
+                    }
+                )
                 f.seek(0)
                 json.dump(history, f, indent=4)
         except (FileNotFoundError, json.JSONDecodeError):
-            with open('feedback_history.json', 'w') as f:
-                json.dump([{
-                    "question": question,
-                    "answer": answer,
-                    "feedback": feedback,
-                    "timestamp": str(datetime.now())
-                }], f, indent=4)
+            with open("feedback_history.json", "w") as f:
+                json.dump(
+                    [
+                        {
+                            "question": question,
+                            "answer": answer,
+                            "feedback": feedback,
+                            "timestamp": str(datetime.now()),
+                        }
+                    ],
+                    f,
+                    indent=4,
+                )
