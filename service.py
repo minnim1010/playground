@@ -49,8 +49,6 @@ class FeedbackService:
         """
         주어진 질문과 답변을 바탕으로 OpenAI에 피드백을 요청합니다.
         """
-        # 이 프롬프트는 피드백의 품질을 결정하는 가장 중요한 부분입니다.
-        # 필요에 따라 수정하여 사용하세요.
         system_prompt = """
         You are an expert English teacher.
         A student was given the following question:
@@ -59,14 +57,15 @@ class FeedbackService:
         The student provided this answer:
         "{answer}"
 
+        Provide a sample revision (a simple, improved version) for reference.
+        Also provide the feedback in Korean, starting with a brief overall summary and then detailing the points above in bullet form.
+        
         Please provide constructive feedback on the student's answer.
         Focus on:
-        1.  **Grammar:** Correct any grammatical errors.
+        1.  **Grammar:** Correct any grammatical errors per sentence.
         2.  **Vocabulary:** Suggest more appropriate or advanced vocabulary.
         3.  **Clarity & Flow:** Comment on the clarity and naturalness of the writing.
         4.  **Relevance:** Assess if the answer directly addresses the question.
-
-        Provide the feedback in Korean, starting with a brief overall summary and then detailing the points above in bullet form.
         """
 
         formatted_prompt = system_prompt.format(question=question, answer=answer)
@@ -78,7 +77,6 @@ class FeedbackService:
                     {"role": "system", "content": "You are a helpful assistant acting as an English teacher."},
                     {"role": "user", "content": formatted_prompt}
                 ],
-                temperature=0.7,
             )
 
             feedback = response.choices[0].message.content
