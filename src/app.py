@@ -78,7 +78,6 @@ controller: AppController = st.session_state.controller
 
 @st.fragment(run_every=180)
 def display_memo_fragment():
-    """20초마다 메모를 새로고침하는 UI 프래그먼트"""
     memo = controller.get_random_memo()
     if memo:
         with st.expander("📌 오늘의 메모", expanded=True):
