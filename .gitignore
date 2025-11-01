@@ -4,3 +4,6 @@ custom
 .venv
 feedback_history.json
 micro_journal.json
+credentials.json
+token.json
+schedule.json
