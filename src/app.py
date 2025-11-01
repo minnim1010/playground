@@ -40,68 +40,68 @@ def initialize_services() -> AppController:
 if 'controller' not in st.session_state:
     st.session_state.controller = initialize_services()
 
-if 'questions' not in st.session_state:
-    st.session_state.questions = st.session_state.controller.get_questions()
+if 'question' not in st.session_state:
+    st.session_state.question = st.session_state.controller.get_question()
 
-if 'current_question_index' not in st.session_state:
-    st.session_state.current_question_index = 0
-
-if 'feedback' not in st.session_state:
-    st.session_state.feedback = ""
+if 'past_feedbacks' not in st.session_state:
+    st.session_state.past_feedbacks = []
 
 # --- 3. UI 렌더링 ---
 st.set_page_config(page_title="영어 공부 앱", layout="wide")
+
+# CSS for sticky and scrollable column
+st.markdown(
+    """
+    <style>
+        /* 오른쪽 history_col (두 번째 column) 내부 스크롤 */
+        div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div[data-testid="stVerticalBlock"] {
+             max-height: 80vh;          /* 세로 최대 높이 제한 */
+             overflow-y: auto;          /* 스크롤 활성화 */
+             padding-right: 8px;        /* 스크롤바 공간 확보 */
+         }
+
+         /* 스크롤 시 내부 배경 색 유지 */
+         div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div[data-testid="stVerticalBlock"]::-webkit-scrollbar {
+             width: 8px;
+         }
+         div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div[data-testid="stVerticalBlock"]::-webkit-scrollbar-thumb {
+             border-radius: 4px;
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("📝 AI 영어 피드백 앱")
 
 # 컨트롤러 가져오기
 controller: AppController = st.session_state.controller
 
-# --- 메인 화면 ---
-if not st.session_state.questions:
-    st.error("'questions.json'에서 질문을 불러오지 못했습니다. 파일을 확인해주세요.")
-else:
-    # --- 질문 표시 ---
-    total_questions = len(st.session_state.questions)
-    idx = st.session_state.current_question_index
-    current_q_data = st.session_state.questions[idx]
-    current_question = current_q_data['question']
+# --- 화면 레이아웃 ---
+main_col, history_col = st.columns([1, 1])
 
-    st.subheader(f"질문 {idx + 1} / {total_questions}")
-    st.info(current_question)
+with main_col:
+    if not st.session_state.question:
+        st.error("'questions.json'에서 질문을 불러오지 못했습니다. 파일을 확인해주세요.")
+    else:
+        current_question = st.session_state.question['question']
 
-    # --- 답변 입력 ---
-    # key를 사용하여 질문이 바뀔 때마다 text_area를 고유하게 만듭니다.
-    user_answer = st.text_area("여기에 영어 답변을 작성하세요:", height=200, key=f"answer_{idx}")
+        st.subheader("질문")
+        st.info(current_question)
 
-    # --- 버튼 ---
-    col1, col2, col3 = st.columns([1, 1, 3])
+        user_answer = st.text_area("여기에 영어 답변을 작성하세요:", height=300, key="answer")
 
-    with col1:
-        if st.button("⬅️ 이전 질문"):
-            st.session_state.current_question_index = (idx - 1) % total_questions
-            st.session_state.feedback = ""  # 피드백 초기화
-            st.rerun()
-
-    with col2:
-        if st.button("다음 질문 ➡️"):
-            st.session_state.current_question_index = (idx + 1) % total_questions
-            st.session_state.feedback = ""  # 피드백 초기화
-            st.rerun()
-
-    with col3:
         if st.button("제출 및 피드백 받기", type="primary"):
             if not user_answer.strip():
                 st.warning("답변을 먼저 작성해주세요.")
             else:
                 with st.spinner("AI가 피드백을 생성 중입니다... 잠시만 기다려주세요."):
-                    feedback = controller.process_answer_and_get_feedback(
-                        current_question,
-                        user_answer
-                    )
-                    st.session_state.feedback = feedback
+                    feedback = controller.process_answer_and_get_feedback(current_question, user_answer)
+                    st.session_state.past_feedbacks.insert(0, feedback)
+                    st.rerun()
 
-    # --- 피드백 표시 ---
-    if st.session_state.feedback:
-        st.divider()
-        st.subheader("🤖 AI 피드백")
-        st.markdown(st.session_state.feedback)
+with history_col:
+    if st.session_state.past_feedbacks:
+        st.subheader("피드백 기록")
+        for i, feedback_item in enumerate(st.session_state.past_feedbacks):
+            with st.expander(f"기록 #{len(st.session_state.past_feedbacks) - i}", expanded=i == 0):
+                st.markdown(feedback_item)

@@ -10,14 +10,13 @@ class AppController:
         self.feedback_service = feedback_service
         self._questions = []
 
-    def get_questions(self) -> list[dict]:
+    def get_question(self) -> dict | None:
         if not self._questions:
             loaded_questions = self.question_service.load_questions()
             if loaded_questions:
-                random_question = random.choice(loaded_questions)
-                self._questions = [random_question]
+                self._questions = loaded_questions[0]
             else:
-                self._questions = []
+                self._questions = None
 
         return self._questions
 
