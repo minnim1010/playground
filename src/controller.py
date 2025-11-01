@@ -1,4 +1,6 @@
 import random
+from datetime import datetime
+
 from service import QuestionService, FeedbackService
 from typing import Optional
 import json
@@ -9,16 +11,32 @@ class AppController:
         self.question_service = question_service
         self.feedback_service = feedback_service
         self._questions = []
+        self._memos = []
 
     def get_question(self) -> dict | None:
         if not self._questions:
             loaded_questions = self.question_service.load_questions()
             if loaded_questions:
-                self._questions = loaded_questions[0]
+                self._questions = random.choice(loaded_questions)
             else:
                 self._questions = None
 
         return self._questions
+
+    def get_random_memo(self) -> str | None:
+        if not self._memos:
+            self._memos = self._load_memos("memo.json")
+
+        if self._memos:
+            return random.choice(self._memos)['memo']
+        return None
+
+    def _load_memos(self, filepath: str) -> list:
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return []
 
     def process_answer_and_get_feedback(self, question: str, answer: str) -> (str | None):
         if not self.feedback_service:
@@ -43,7 +61,8 @@ class AppController:
                 history.append({
                     "question": question,
                     "answer": answer,
-                    "feedback": feedback
+                    "feedback": feedback,
+                    "timestamp": str(datetime.now())
                 })
                 f.seek(0)
                 json.dump(history, f, indent=4)
@@ -52,5 +71,6 @@ class AppController:
                 json.dump([{
                     "question": question,
                     "answer": answer,
-                    "feedback": feedback
+                    "feedback": feedback,
+                    "timestamp": str(datetime.now())
                 }], f, indent=4)

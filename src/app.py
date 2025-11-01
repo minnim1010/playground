@@ -76,6 +76,14 @@ st.title("📝 AI 영어 피드백 앱")
 # 컨트롤러 가져오기
 controller: AppController = st.session_state.controller
 
+@st.fragment(run_every=180)
+def display_memo_fragment():
+    """20초마다 메모를 새로고침하는 UI 프래그먼트"""
+    memo = controller.get_random_memo()
+    if memo:
+        with st.expander("📌 오늘의 메모", expanded=True):
+            st.info(memo)
+
 # --- 화면 레이아웃 ---
 main_col, history_col = st.columns([1, 1])
 
@@ -88,7 +96,7 @@ with main_col:
         st.subheader("질문")
         st.info(current_question)
 
-        user_answer = st.text_area("여기에 영어 답변을 작성하세요:", height=300, key="answer")
+        user_answer = st.text_area("여기에 영어 답변을 작성하세요:", height=200, key="answer")
 
         if st.button("제출 및 피드백 받기", type="primary"):
             if not user_answer.strip():
@@ -98,6 +106,8 @@ with main_col:
                     feedback = controller.process_answer_and_get_feedback(current_question, user_answer)
                     st.session_state.past_feedbacks.insert(0, feedback)
                     st.rerun()
+
+        display_memo_fragment()
 
 with history_col:
     if st.session_state.past_feedbacks:
