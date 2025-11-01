@@ -2,8 +2,8 @@ import os
 import sys
 from getpass import getpass
 from dotenv import load_dotenv
-from service import QuestionService, FeedbackService
-from controller import AppController
+from src.service import QuestionService, FeedbackService
+from src.controller import AppController
 
 
 def main():
@@ -21,7 +21,7 @@ def main():
 
     # 2. 서비스 및 컨트롤러 초기화
     try:
-        question_service = QuestionService(filepath="questions.json")
+        question_service = QuestionService(filepath="../questions.json")
         feedback_service = FeedbackService(api_key=api_key)
         controller = AppController(question_service, feedback_service)
     except FileNotFoundError as e:
