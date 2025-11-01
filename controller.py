@@ -4,20 +4,12 @@ from typing import Optional
 
 
 class AppController:
-    """
-    애플리케이션의 로직을 조율하는 컨트롤러
-    (서비스 계층과 뷰 계층을 연결)
-    """
-
     def __init__(self, question_service: QuestionService, feedback_service: Optional[FeedbackService] = None):
         self.question_service = question_service
         self.feedback_service = feedback_service
-        self._questions = []  # 질문 캐싱
+        self._questions = []
 
     def get_questions(self) -> list[dict]:
-        """
-        질문 목록을 가져옵니다 (캐시된 경우 캐시 사용).
-        """
         if not self._questions:
             loaded_questions = self.question_service.load_questions()
             if loaded_questions:
@@ -29,9 +21,6 @@ class AppController:
         return self._questions
 
     def process_answer_and_get_feedback(self, question: str, answer: str) -> (str | None):
-        """
-        답변을 처리하고 피드백 서비스에 피드백을 요청합니다.
-        """
         if not self.feedback_service:
             print("오류: FeedbackService가 설정되지 않았습니다.")
             return "피드백 서비스를 설정해주세요."

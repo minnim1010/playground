@@ -8,11 +8,8 @@ from controller import AppController
 
 def main():
     print("--- CLI 영어 공부 앱 ---")
-
-    # .env 파일 로드
     load_dotenv()
 
-    # 1. API 키 설정
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("OPENAI_API_KEY 환경 변수가 설정되지 않았습니다.")

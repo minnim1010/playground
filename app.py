@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from service import QuestionService, FeedbackService
 from controller import AppController
 
-# .env 파일 로드
 load_dotenv()
 
 
