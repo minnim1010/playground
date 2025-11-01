@@ -18,5 +18,45 @@
   {
     "id": 5,
     "question": "What is your opinion on remote work (working from home)? Discuss its pros and cons."
+  },
+  {
+    "id": 6,
+    "question": "What motivates you to keep improving yourself, even when things get difficult?"
+  },
+  {
+    "id": 7,
+    "question": "Describe a memorable experience that changed your perspective on something important."
+  },
+  {
+    "id": 8,
+    "question": "Do you think artificial intelligence will create more jobs or take them away? Explain your reasoning."
+  },
+  {
+    "id": 9,
+    "question": "If you could have dinner with any historical figure, who would it be and what would you ask them?"
+  },
+  {
+    "id": 10,
+    "question": "How do you define success, and has that definition changed over time?"
+  },
+  {
+    "id": 11,
+    "question": "What are some habits or routines that help you stay productive?"
+  },
+  {
+    "id": 12,
+    "question": "Do you prefer working in a team or alone? Why?"
+  },
+  {
+    "id": 13,
+    "question": "What is one technological invention you can’t live without, and why?"
+  },
+  {
+    "id": 14,
+    "question": "If you could instantly learn a new skill, what would it be and how would you use it?"
+  },
+  {
+    "id": 15,
+    "question": "What are the advantages and disadvantages of social media in modern society?"
   }
 ]
