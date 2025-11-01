@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "question": "What did you do last weekend? Describe your activities in detail."
+  },
+  {
+    "id": 2,
+    "question": "Describe your favorite hobby. Why do you enjoy it so much?"
+  },
+  {
+    "id": 3,
+    "question": "What are your plans for the next holiday? (e.g., vacation, family gatherings, etc.)"
+  },
+  {
+    "id": 4,
+    "question": "If you could travel anywhere in the world, where would you go and why?"
+  },
+  {
+    "id": 5,
+    "question": "What is your opinion on remote work (working from home)? Discuss its pros and cons."
+  }
+]
