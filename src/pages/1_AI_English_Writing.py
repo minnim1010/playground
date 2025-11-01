@@ -48,7 +48,7 @@ if 'past_feedbacks' not in st.session_state:
     st.session_state.past_feedbacks = []
 
 # --- 3. UI 렌더링 ---
-st.set_page_config(page_title="영어 공부 앱", layout="wide")
+st.set_page_config(page_title="AI English Writing", layout="wide")
 
 # CSS for sticky and scrollable column
 st.markdown(
