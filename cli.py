@@ -1,12 +1,16 @@
 import os
 import sys
 from getpass import getpass
+from dotenv import load_dotenv
 from service import QuestionService, FeedbackService
 from controller import AppController
 
 
 def main():
     print("--- CLI 영어 공부 앱 ---")
+
+    # .env 파일 로드
+    load_dotenv()
 
     # 1. API 키 설정
     api_key = os.getenv("OPENAI_API_KEY")

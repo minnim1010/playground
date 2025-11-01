@@ -73,7 +73,7 @@ class FeedbackService:
 
         try:
             response: ChatCompletion = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",  # 또는 "gpt-4"
+                model="gpt-5-nano",  # 또는 "gpt-4"
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant acting as an English teacher."},
                     {"role": "user", "content": formatted_prompt}

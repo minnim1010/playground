@@ -1,3 +1,4 @@
+import random
 from service import QuestionService, FeedbackService
 from typing import Optional
 
@@ -13,18 +14,18 @@ class AppController:
         self.feedback_service = feedback_service
         self._questions = []  # 질문 캐싱
 
-    def set_feedback_service(self, feedback_service: FeedbackService):
-        """
-        API 키가 나중에 제공될 경우를 대비해 피드백 서비스 설정
-        """
-        self.feedback_service = feedback_service
-
     def get_questions(self) -> list[dict]:
         """
         질문 목록을 가져옵니다 (캐시된 경우 캐시 사용).
         """
         if not self._questions:
-            self._questions = self.question_service.load_questions()
+            loaded_questions = self.question_service.load_questions()
+            if loaded_questions:
+                random_question = random.choice(loaded_questions)
+                self._questions = [random_question]
+            else:
+                self._questions = []
+
         return self._questions
 
     def process_answer_and_get_feedback(self, question: str, answer: str) -> (str | None):

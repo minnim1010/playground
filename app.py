@@ -1,6 +1,11 @@
 import streamlit as st
+import os
+from dotenv import load_dotenv
 from service import QuestionService, FeedbackService
 from controller import AppController
+
+# .env 파일 로드
+load_dotenv()
 
 
 # --- 1. 초기화 ---
@@ -10,11 +15,22 @@ def initialize_services() -> AppController:
     """
     try:
         question_service = QuestionService(filepath="questions.json")
-        # FeedbackService는 API 키가 입력된 후에 초기화됩니다.
-        controller = AppController(question_service=question_service)
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            st.error("OPENAI_API_KEY 환경 변수를 설정해주세요.")
+            st.stop()
+
+        feedback_service = FeedbackService(api_key=api_key)
+        controller = AppController(
+            question_service=question_service,
+            feedback_service=feedback_service
+        )
         return controller
     except FileNotFoundError as e:
         st.error(f"초기화 오류: {e}. 'questions.json' 파일이 있는지 확인하세요.")
+        st.stop()
+    except ValueError as e:
+        st.error(f"API 키 오류: {e}")
         st.stop()
     except Exception as e:
         st.error(f"알 수 없는 오류 발생: {e}")
@@ -40,21 +56,6 @@ st.title("📝 AI 영어 피드백 앱")
 
 # 컨트롤러 가져오기
 controller: AppController = st.session_state.controller
-
-# --- 사이드바: API 키 입력 ---
-with st.sidebar:
-    st.header("설정")
-    api_key = st.text_input("OpenAI API Key", type="password")
-
-    if api_key:
-        try:
-            feedback_service = FeedbackService(api_key=api_key)
-            controller.set_feedback_service(feedback_service)
-            st.success("API 키가 설정되었습니다!", icon="✅")
-        except ValueError as e:
-            st.error(f"API 키 오류: {e}")
-    else:
-        st.warning("OpenAI API 키를 입력해주세요.", icon="⚠️")
 
 # --- 메인 화면 ---
 if not st.session_state.questions:
@@ -89,10 +90,8 @@ else:
             st.rerun()
 
     with col3:
-        if st.button("제출 및 피드백 받기", type="primary", disabled=(not api_key)):
-            if not controller.feedback_service:
-                st.error("OpenAI API 키를 먼저 입력해주세요.")
-            elif not user_answer.strip():
+        if st.button("제출 및 피드백 받기", type="primary"):
+            if not user_answer.strip():
                 st.warning("답변을 먼저 작성해주세요.")
             else:
                 with st.spinner("AI가 피드백을 생성 중입니다... 잠시만 기다려주세요."):
