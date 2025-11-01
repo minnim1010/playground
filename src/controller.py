@@ -1,6 +1,7 @@
 import random
 from service import QuestionService, FeedbackService
 from typing import Optional
+import json
 
 
 class AppController:
@@ -30,7 +31,27 @@ class AppController:
 
         try:
             feedback = self.feedback_service.get_feedback(question, answer)
+            self._save_feedback(question, answer, feedback)
             return feedback
         except Exception as e:
             print(f"컨트롤러에서 피드백 처리 중 오류: {e}")
             return f"피드백 생성 중 오류가 발생했습니다: {e}"
+
+    def _save_feedback(self, question: str, answer: str, feedback: str):
+        try:
+            with open('feedback_history.json', 'r+') as f:
+                history = json.load(f)
+                history.append({
+                    "question": question,
+                    "answer": answer,
+                    "feedback": feedback
+                })
+                f.seek(0)
+                json.dump(history, f, indent=4)
+        except (FileNotFoundError, json.JSONDecodeError):
+            with open('feedback_history.json', 'w') as f:
+                json.dump([{
+                    "question": question,
+                    "answer": answer,
+                    "feedback": feedback
+                }], f, indent=4)

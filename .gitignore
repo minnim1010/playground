@@ -2,3 +2,4 @@ custom
 .env
 .idea
 .venv
+feedback_history.json
