@@ -89,6 +89,22 @@ def add_image_log(uploaded_file, topic_id):
     return new_log
 
 
+def move_logs_to_topic(log_ids, target_topic_id):
+    """Moves a list of logs to a new parent topic."""
+    if not log_ids or not target_topic_id:
+        return
+
+    data = service.load_data()
+    logs_updated = False
+    for log in data.get("logs", []):
+        if log["id"] in log_ids:
+            log["topic_id"] = target_topic_id
+            logs_updated = True
+
+    if logs_updated:
+        service.save_data(data)
+
+
 # --- Log Promotion ---
 
 
