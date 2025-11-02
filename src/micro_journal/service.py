@@ -9,7 +9,11 @@ class MicroJournalService:
     마이크로 저널 데이터 관리 및 AI 요약을 담당하는 서비스
     """
 
-    def __init__(self, db_path: str = "micro_journal.json", api_key: str | None = None):
+    def __init__(
+        self,
+        db_path: str = "storage/private/micro_journal.json",
+        api_key: str | None = None,
+    ):
         self.db_path = db_path
         self.client = OpenAI(api_key=api_key) if api_key else None
         self._initialize_db()

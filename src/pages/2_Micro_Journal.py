@@ -19,7 +19,7 @@ def initialize_controller() -> MicroJournalController:
             "OPENAI_API_KEY가 설정되지 않았습니다. 요약 기능이 제한될 수 있습니다."
         )
 
-    db_path = "micro_journal.json"
+    db_path = "storage/private/micro_journal.json"
     service = MicroJournalService(db_path=db_path, api_key=api_key)
     controller = MicroJournalController(service)
     return controller

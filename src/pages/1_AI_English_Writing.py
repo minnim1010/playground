@@ -14,7 +14,7 @@ def initialize_services() -> AppController:
     서비스와 컨트롤러를 초기화합니다.
     """
     try:
-        question_service = QuestionService(filepath="questions.json")
+        question_service = QuestionService(filepath="storage/questions.json")
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             st.error("OPENAI_API_KEY 환경 변수를 설정해주세요.")

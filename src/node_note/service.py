@@ -4,7 +4,7 @@ from datetime import datetime
 import uuid
 
 # --- Constants ---
-DATA_FILE = "node_note_data.json"
+DATA_FILE = "storage/private/node_note_data.json"
 
 # --- Data File Management ---
 

@@ -11,7 +11,9 @@ SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
 class AISchedulerService:
-    def __init__(self, db_path: str = "schedule.json", api_key: str | None = None):
+    def __init__(
+        self, db_path: str = "storage/private/schedule.json", api_key: str | None = None
+    ):
         self.db_path = db_path
         self._initialize_db()
         self.creds = self._get_google_credentials()

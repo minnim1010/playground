@@ -2,10 +2,7 @@ custom
 .env
 .idea
 .venv
-feedback_history.json
-micro_journal.json
+storage/private
 credentials.json
 token.json
-schedule.json
-node_note_data.json
 img

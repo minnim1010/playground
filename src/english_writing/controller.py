@@ -60,7 +60,7 @@ class AppController:
 
     def _save_feedback(self, question: str, answer: str, feedback: str):
         try:
-            with open("feedback_history.json", "r+") as f:
+            with open("storage/private/feedback_history.json", "r+") as f:
                 history = json.load(f)
                 history.append(
                     {
@@ -73,7 +73,7 @@ class AppController:
                 f.seek(0)
                 json.dump(history, f, indent=4)
         except (FileNotFoundError, json.JSONDecodeError):
-            with open("feedback_history.json", "w") as f:
+            with open("storage/private/feedback_history.json", "w") as f:
                 json.dump(
                     [
                         {
