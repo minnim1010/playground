@@ -22,8 +22,7 @@ def initialize_services() -> AppController:
 
         feedback_service = FeedbackService(api_key=api_key)
         controller = AppController(
-            question_service=question_service,
-            feedback_service=feedback_service
+            question_service=question_service, feedback_service=feedback_service
         )
         return controller
     except FileNotFoundError as e:
@@ -38,13 +37,13 @@ def initialize_services() -> AppController:
 
 
 # --- 2. Streamlit 세션 상태 관리 ---
-if 'controller' not in st.session_state:
+if "controller" not in st.session_state:
     st.session_state.controller = initialize_services()
 
-if 'question' not in st.session_state:
+if "question" not in st.session_state:
     st.session_state.question = st.session_state.controller.get_question()
 
-if 'past_feedbacks' not in st.session_state:
+if "past_feedbacks" not in st.session_state:
     st.session_state.past_feedbacks = []
 
 # --- 3. UI 렌더링 ---
@@ -69,7 +68,7 @@ st.markdown(
              border-radius: 4px;
     </style>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 st.title("📝 AI 영어 피드백 앱")
@@ -77,41 +76,50 @@ st.title("📝 AI 영어 피드백 앱")
 # 컨트롤러 가져오기
 controller: AppController = st.session_state.controller
 
+
 @st.fragment(run_every=180)
 def display_memo_fragment():
     memo = controller.get_random_memo()
     if memo:
-        with st.expander("📌 오늘의 메모", expanded=True):
-            st.info(memo)
+        st.info(memo)
+
 
 # --- 화면 레이아웃 ---
 main_col, history_col = st.columns([1, 1])
 
 with main_col:
     if not st.session_state.question:
-        st.error("'questions.json'에서 질문을 불러오지 못했습니다. 파일을 확인해주세요.")
+        st.error(
+            "'questions.json'에서 질문을 불러오지 못했습니다. 파일을 확인해주세요."
+        )
     else:
-        current_question = st.session_state.question['question']
+        current_question = st.session_state.question["question"]
 
         st.subheader("질문")
         st.info(current_question)
 
-        user_answer = st.text_area("여기에 영어 답변을 작성하세요:", height=200, key="answer")
+        user_answer = st.text_area(
+            "여기에 영어 답변을 작성하세요:", height=200, key="answer"
+        )
+
+        display_memo_fragment()
 
         if st.button("제출 및 피드백 받기", type="primary"):
             if not user_answer.strip():
                 st.warning("답변을 먼저 작성해주세요.")
             else:
                 with st.spinner("AI가 피드백을 생성 중입니다... 잠시만 기다려주세요."):
-                    feedback = controller.process_answer_and_get_feedback(current_question, user_answer)
+                    feedback = controller.process_answer_and_get_feedback(
+                        current_question, user_answer
+                    )
                     st.session_state.past_feedbacks.insert(0, feedback)
                     st.rerun()
-
-        display_memo_fragment()
 
 with history_col:
     if st.session_state.past_feedbacks:
         st.subheader("피드백 기록")
         for i, feedback_item in enumerate(st.session_state.past_feedbacks):
-            with st.expander(f"기록 #{len(st.session_state.past_feedbacks) - i}", expanded=i == 0):
+            with st.expander(
+                f"기록 #{len(st.session_state.past_feedbacks) - i}", expanded=i == 0
+            ):
                 st.markdown(feedback_item)
