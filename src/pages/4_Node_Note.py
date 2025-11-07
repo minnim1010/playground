@@ -139,7 +139,7 @@ def main():
 
         with display_col:
             if log.get("type") == "image":
-                st.image(log["text"], use_column_width=True)
+                st.image(log["text"], use_container_width=True)
             else:
                 st.markdown(f"- {log['text']}")
 
