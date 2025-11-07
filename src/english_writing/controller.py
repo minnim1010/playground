@@ -29,7 +29,7 @@ class AppController:
 
     def get_random_memo(self) -> str | None:
         if not self._memos:
-            self._memos = self._load_memos("memo.json")
+            self._memos = self._load_memos("storage/memo.json")
 
         if self._memos:
             return random.choice(self._memos)["memo"]
