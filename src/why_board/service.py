@@ -1,3 +1,6 @@
+from typing import Sequence
+
+from why_board.models import AIResponse
 from why_board.repository import task_repo, ai_response_repo
 import streamlit as st
 import openai
@@ -20,18 +23,18 @@ class AIResponseService:
         Generates and saves an AI suggestion for a given task.
         """
         suggestion = self._get_ai_suggestion(
-            task["title"],
-            task["description"],
-            task["why"],
-            task["how"],
-            task["caution"],
+            task.title,
+            task.description,
+            task.why,
+            task.how,
+            task.caution,
         )
         if suggestion:
-            ai_response_repo.add(task_id=task["id"], response=suggestion)
+            ai_response_repo.add(task_id=task.id, response=suggestion)
             return suggestion
         return None
 
-    def get_responses_for_task(self, task_id):
+    def get_responses_for_task(self, task_id) -> Sequence[AIResponse]:
         return ai_response_repo.get_for_task(task_id)
 
     def _get_ai_suggestion(self, task_title, task_description, why, how, caution):

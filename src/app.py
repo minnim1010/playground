@@ -1,4 +1,13 @@
 import streamlit as st
+from dotenv import load_dotenv
+
+# Import models from all apps to ensure they are registered with SQLModel's metadata
+
+from database import init_db
+
+# Initialize the database and create tables
+load_dotenv()
+init_db()
 
 st.set_page_config(
     page_title="Hello",

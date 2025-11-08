@@ -34,7 +34,7 @@ def show():
     if "selected_task_id" not in st.session_state:
         st.session_state.selected_task_id = None
         if st.session_state.tasks:
-            st.session_state.selected_task_id = st.session_state.tasks[-1]["id"]
+            st.session_state.selected_task_id = st.session_state.tasks[-1].id
 
     # --- Layout ---
     left_col, right_col = st.columns([1, 2])
@@ -50,9 +50,9 @@ def show():
 
         for task in reversed(st.session_state.tasks):
             if st.button(
-                task["title"], key=f"task_btn_{task['id']}", use_container_width=True
+                task.title, key=f"task_btn_{task.id}", use_container_width=True
             ):
-                st.session_state.selected_task_id = task["id"]
+                st.session_state.selected_task_id = task.id
                 st.rerun()
 
     # --- Right Section: Task Details ---
@@ -66,34 +66,34 @@ def show():
                 (
                     task
                     for task in st.session_state.tasks
-                    if task["id"] == st.session_state.selected_task_id
+                    if task.id == st.session_state.selected_task_id
                 ),
                 None,
             )
 
             if selected_task:
-                st.subheader(selected_task["title"])
-                st.text_area("Description", value=selected_task.get("description", ""))
-                st.text_area("Why", value=selected_task.get("why", ""))
-                st.text_area("How", value=selected_task.get("how", ""))
-                st.text_area("Caution", value=selected_task.get("caution", ""))
+                st.subheader(selected_task.title)
+                st.text_area("Description", value=selected_task.description)
+                st.text_area("Why", value=selected_task.why)
+                st.text_area("How", value=selected_task.how)
+                st.text_area("Caution", value=selected_task.caution)
 
                 st.divider()
 
-                if st.button("Get AI Suggestion", key=f"ai_btn_{selected_task['id']}"):
+                if st.button("Get AI Suggestion", key=f"ai_btn_{selected_task.id}"):
                     with st.spinner("Generating AI suggestion..."):
                         controller.suggest_questions_by_ai(selected_task)
                         st.rerun()
 
                 # --- AI Response History ---
-                ai_responses = controller.get_ai_responses_for_task(selected_task["id"])
+                ai_responses = controller.get_ai_responses_for_task(selected_task.id)
                 if ai_responses:
                     st.subheader("AI Suggestion History")
                     for i, response in enumerate(ai_responses):
                         with st.expander(
-                            f"Suggestion {len(ai_responses) - i} ({response.get('created_at', 'No timestamp')})"
+                            f"Suggestion {len(ai_responses) - i} ({response.created_at})"
                         ):
-                            st.info(response["ai_response"])
+                            st.info(response.ai_response)
             else:
                 st.warning("Selected task not found.")
                 st.session_state.selected_task_id = None

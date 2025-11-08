@@ -1,53 +1,45 @@
-import json
-import os
-from openai import OpenAI  # 최신 openai 라이브러리 사용
+from openai import OpenAI
 from openai.types.chat import ChatCompletion
+
+from .repository import QuestionRepository
 
 
 class QuestionService:
     """
-    질문 데이터를 로드하고 관리하는 서비스
+    Service to load and manage question data.
     """
 
-    def __init__(self, filepath: str):
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"질문 파일 '{filepath}'을 찾을 수 없습니다.")
-        self.filepath = filepath
+    def __init__(self):
+        self.repository = QuestionRepository()
 
     def load_questions(self) -> list[dict]:
         """
-        JSON 파일에서 질문 목록을 로드합니다.
+        Loads a list of questions from the database.
         """
         try:
-            with open(self.filepath, 'r', encoding='utf-8') as f:
-                questions = json.load(f)
-            if not isinstance(questions, list) or not all(isinstance(q, dict) and 'question' in q for q in questions):
-                raise ValueError("질문 파일은 'question' 키를 포함하는 객체들의 리스트여야 합니다.")
-            return questions
-        except json.JSONDecodeError:
-            print(f"오류: '{self.filepath}' 파일이 유효한 JSON 형식이 아닙니다.")
-            return []
+            questions = self.repository.get_all()
+            return [{"id": q.id, "question": q.question} for q in questions]
         except Exception as e:
-            print(f"질문 로드 중 오류 발생: {e}")
+            print(f"Error loading questions: {e}")
             return []
 
 
 class FeedbackService:
     """
-    OpenAI API와 통신하여 영어 답변에 대한 피드백을 생성하는 서비스
+    Service to generate feedback for English answers by communicating with the OpenAI API.
     """
 
     def __init__(self, api_key: str):
         if not api_key:
-            raise ValueError("OpenAI API 키가 필요합니다.")
+            raise ValueError("OpenAI API key is required.")
         try:
             self.client = OpenAI(api_key=api_key)
         except Exception as e:
-            raise ValueError(f"OpenAI 클라이언트 초기화 실패: {e}")
+            raise ValueError(f"Failed to initialize OpenAI client: {e}")
 
     def get_feedback(self, question: str, answer: str) -> str:
         """
-        주어진 질문과 답변을 바탕으로 OpenAI에 피드백을 요청합니다.
+        Requests feedback from OpenAI based on the given question and answer.
         """
         system_prompt = """
         You are an expert English teacher.
@@ -72,10 +64,13 @@ class FeedbackService:
 
         try:
             response: ChatCompletion = self.client.chat.completions.create(
-                model="gpt-5-nano",  # 또는 "gpt-4"
+                model="gpt-5-nano",  # or "gpt-4"
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant acting as an English teacher."},
-                    {"role": "user", "content": formatted_prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a helpful assistant acting as an English teacher.",
+                    },
+                    {"role": "user", "content": formatted_prompt},
                 ],
             )
 
@@ -83,8 +78,8 @@ class FeedbackService:
             if feedback:
                 return feedback.strip()
             else:
-                return "OpenAI로부터 유효한 피드백을 받지 못했습니다."
+                return "No valid feedback was received from OpenAI."
 
         except Exception as e:
-            print(f"OpenAI API 호출 중 오류 발생: {e}")
-            return f"피드백 생성 중 오류가 발생했습니다: {e}"
+            print(f"An error occurred during the OpenAI API call: {e}")
+            return f"An error occurred while generating feedback: {e}"

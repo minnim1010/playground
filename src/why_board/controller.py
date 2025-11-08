@@ -1,13 +1,15 @@
+from typing import Sequence
+
 import streamlit as st
+
+from why_board.models import AIResponse
 from why_board.service import task_service, ai_response_service
-from common.repository.base import init_db
 
 
 def initialize_session_state():
     """
     Initializes the database and loads tasks into the session state.
     """
-    init_db()
     if "tasks" not in st.session_state:
         st.session_state.tasks = task_service.get_all_tasks()
     if "openai_api_key" not in st.session_state:
@@ -24,7 +26,7 @@ def add_task(title, description, why, how, caution):
     return new_task
 
 
-def get_ai_responses_for_task(task_id):
+def get_ai_responses_for_task(task_id) -> Sequence[AIResponse]:
     """
     Retrieves all AI responses for a given task_id from the service.
     """

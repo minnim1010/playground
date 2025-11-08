@@ -6,3 +6,4 @@ storage/private
 credentials.json
 token.json
 img
+playground.db
