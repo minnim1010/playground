@@ -72,8 +72,8 @@ def main():
     st.header(f"📜 {current_topic['title']}")
 
     # --- Log Input Area ---
-    log_text = st.text_input(
-        "Add a one-line log...", key="log_input", placeholder="What's on your mind?"
+    log_text = st.text_area(
+        "Add a log...", key="log_input", placeholder="What's on your mind?"
     )
     log_col, img_col = st.columns(2)
     if log_col.button("Add Log", key="add_log_button") and log_text:
@@ -141,7 +141,7 @@ def main():
             if log.get("type") == "image":
                 st.image(log["text"], use_container_width=True)
             else:
-                st.markdown(f"- {log['text']}")
+                st.markdown(log["text"].replace("\n", "<br>"), unsafe_allow_html=True)
 
         if not st.session_state.move_mode:
             with action_col:
