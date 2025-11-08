@@ -137,7 +137,6 @@ def parse_pod_info(pod_info, grep_filter):
     if "No matching pods found" in pod_info:
         st.info(pod_info)
     elif grep_filter:
-        st.subheader("Filtered Output:")
         st.code(pod_info, language="bash")
     else:
         try:
