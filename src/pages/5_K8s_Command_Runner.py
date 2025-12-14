@@ -60,7 +60,7 @@ def main_page():
     # Bottom half: Command Execution
     st.header("Pod Specific Commands")
 
-    pod_name_col, logs_col, desc_col = st.columns([4, 1, 1])
+    pod_name_col, logs_col, desc_col, stern_col = st.columns([4, 1, 1, 1])
 
     with pod_name_col:
         st.text_input("Pod Name", key="pod_name", label_visibility="collapsed")
@@ -71,6 +71,10 @@ def main_page():
 
     with desc_col:
         if st.button("Describe Pod", use_container_width=True, key="describe_button"):
+            handle_pod_specific_commands(kubecontext, namespace)
+
+    with stern_col:
+        if st.button("Stern", use_container_width=True, key="stern"):
             handle_pod_specific_commands(kubecontext, namespace)
 
     command_input_col, run_button_col = st.columns([5, 1])
