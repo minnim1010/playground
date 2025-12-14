@@ -22,6 +22,7 @@ CONTEXT_MAP = {
             "k8s-production-eu-cluster-4",
             "k8s-production-eu-cluster-5",
             "k8s-production-eu-cluster-6",
+            "k8s-production-eu-cluster-7",
             "eu01-infra02",
         ],
         "us": [
@@ -30,9 +31,9 @@ CONTEXT_MAP = {
         ],
         "ap": [
             "k8s-production-ap-cluster-0",
+            "k8s-production-ap-cluster-1",
             "k8s-production-ap-cluster-2",
             "k8s-production-ap-cluster-3",
-            "k8s-production-ap-cluster-4",
             "k8s-production-ap-cluster-5",
             "k8s-production-ap-cluster-6",
         ],
@@ -100,6 +101,8 @@ def handle_pod_specific_commands(kubecontext, namespace):
             st.session_state.command = f"kubectl logs -f {st.session_state.pod_name} --context {kubecontext} -n {namespace}"
         elif st.session_state.get("describe_button"):
             st.session_state.command = f"kubectl describe pod {st.session_state.pod_name} --context {kubecontext} -n {namespace}"
+        elif st.session_state.get("stern"):
+            st.session_state.command = f"stern {st.session_state.pod_name} -n {namespace} --context {kubecontext} --max-log-requests 150 -c data-engineering-sqs-ingestor | grep ERROR"
     else:
         st.warning("Please enter a Pod Name.")
         st.session_state.command = ""
@@ -110,7 +113,7 @@ def run_specific_command():
     st.session_state.output = ""
     st.session_state.error = ""
     if st.session_state.command:
-        if "logs -f" in st.session_state.command:
+        if "logs -f" in st.session_state.command or "stern" in st.session_state.command:
             return stream_command(st.session_state.command)
         else:
             try:
