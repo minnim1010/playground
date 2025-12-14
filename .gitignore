@@ -7,3 +7,4 @@ credentials.json
 token.json
 img
 playground.db
+**/__pycache__
