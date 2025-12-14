@@ -55,7 +55,7 @@ else:
     else:
         for usage in word.usages:
             st.divider()
-            st.subheader(f"Usage: {usage.usage_type}")
+            st.subheader(f"{usage.usage_type}")
             if usage.description:
                 st.write(usage.description)
 
@@ -71,7 +71,7 @@ else:
             if usage.writing_practices:
                 st.write("**Practice:**")
                 for practice in usage.writing_practices:
-                    with st.expander(f"Translate: {practice.korean_sentence}"):
+                    with st.expander(f"{practice.korean_sentence}"):
                         user_answer = st.text_area(
                             "Write your translation:",
                             key=f"practice_{practice.id}",
