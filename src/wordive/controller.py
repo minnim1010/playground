@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from .service import WordService, WordDetailService
+from .service import WordService, WordDetailService, WordImportService
 from .models import Word
 
 
@@ -25,3 +25,12 @@ class WordDetailController:
         return self.word_detail_service.save_user_attempt(
             writing_practice_id, user_answer
         )
+
+
+class WordImportController:
+    def __init__(self):
+        self.import_service = WordImportService()
+
+    def import_word_from_json(self, json_data: str) -> Word:
+        """Import word from JSON data."""
+        return self.import_service.import_word_from_json(json_data)
