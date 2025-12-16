@@ -3,6 +3,7 @@ from wordive.controller import (
     WordListController,
     WordDetailController,
     WordImportController,
+    WritingPracticeQuizController,
 )
 
 
@@ -14,17 +15,97 @@ if "word_list_controller" not in st.session_state:
 if "word_import_controller" not in st.session_state:
     st.session_state.word_import_controller = WordImportController()
 
+if "quiz_controller" not in st.session_state:
+    st.session_state.quiz_controller = WritingPracticeQuizController()
+
 if "selected_word_id" not in st.session_state:
     st.session_state.selected_word_id = None
 
 if "show_add_modal" not in st.session_state:
     st.session_state.show_add_modal = False
 
+if "current_quiz_practice" not in st.session_state:
+    st.session_state.current_quiz_practice = None
+
+if "quiz_submitted" not in st.session_state:
+    st.session_state.quiz_submitted = False
+
+if "quiz_user_answer" not in st.session_state:
+    st.session_state.quiz_user_answer = ""
+
 controller: WordListController = st.session_state.word_list_controller
 import_controller: WordImportController = st.session_state.word_import_controller
+quiz_controller: WritingPracticeQuizController = st.session_state.quiz_controller
 
 if st.session_state.selected_word_id is None:
     st.title("📚 Wordive")
+
+    # Quiz section
+    st.markdown("---")
+    st.subheader("📝 Daily Quiz")
+
+    # Initialize or get current quiz practice
+    if st.session_state.current_quiz_practice is None:
+        practice = quiz_controller.get_recent_practice()
+        if practice is None:
+            practice = quiz_controller.get_random_practice()
+        st.session_state.current_quiz_practice = practice
+        st.session_state.quiz_submitted = False
+
+    current_practice = st.session_state.current_quiz_practice
+
+    if current_practice:
+        st.write("**Translate to English:**")
+        st.info(f"🇰🇷 {current_practice.korean_sentence}")
+
+        if not st.session_state.quiz_submitted:
+            user_answer = st.text_area(
+                "Write your translation:",
+                key="quiz_answer",
+                height=100,
+            )
+
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                if st.button("Submit", key="quiz_submit", use_container_width=True):
+                    if user_answer.strip():
+                        quiz_controller.save_quiz_attempt(
+                            current_practice.id, user_answer
+                        )
+                        st.session_state.quiz_user_answer = user_answer
+                        st.session_state.quiz_submitted = True
+                        st.rerun()
+                    else:
+                        st.warning("Please write your translation first.")
+            with col2:
+                if st.button(
+                    "🔄 Another Practice", key="quiz_another", use_container_width=True
+                ):
+                    practice = quiz_controller.get_random_practice()
+                    if practice:
+                        st.session_state.current_quiz_practice = practice
+                        st.session_state.quiz_submitted = False
+                        st.session_state.quiz_user_answer = ""
+                        st.rerun()
+        else:
+            st.write("**Your answer:**")
+            st.write(st.session_state.quiz_user_answer)
+            st.write("**Correct answer:**")
+            st.success(f"🇬🇧 {current_practice.english_answer}")
+
+            if st.button("🔄 Another Practice", key="quiz_another_after"):
+                practice = quiz_controller.get_random_practice()
+                if practice:
+                    st.session_state.current_quiz_practice = practice
+                    st.session_state.quiz_submitted = False
+                    st.session_state.quiz_user_answer = ""
+                    st.rerun()
+    else:
+        st.info(
+            "No writing practices available. Please add words with writing practices first."
+        )
+
+    st.markdown("---")
 
     col1, col2 = st.columns([3, 1])
     with col1:

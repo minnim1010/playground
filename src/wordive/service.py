@@ -1,5 +1,7 @@
 import json
+from datetime import datetime, timedelta
 from typing import List, Optional
+import random
 
 from sqlmodel import Session, select
 from database import engine
@@ -133,3 +135,49 @@ class WordImportService:
                 )
 
         return word
+
+
+class WritingPracticeQuizService:
+    def __init__(self):
+        self.practice_repository = WritingPracticeRepository()
+        self.attempt_repository = UserAttemptRepository()
+
+    def get_recent_practices(self, days: int = 7) -> List[WritingPractice]:
+        """Get WritingPractices that were studied within the last N days."""
+        cutoff_date = datetime.utcnow() - timedelta(days=days)
+
+        with Session(engine) as session:
+            # Get all WritingPractices that have attempts within the last N days
+            statement = select(UserAttempt).where(
+                UserAttempt.created_at >= cutoff_date,
+                UserAttempt.writing_practice_id is not None,
+            )
+            recent_attempts = list(session.exec(statement).all())
+
+            # Get unique WritingPractice IDs
+            practice_ids = set(
+                attempt.writing_practice_id
+                for attempt in recent_attempts
+                if attempt.writing_practice_id
+            )
+
+            if not practice_ids:
+                return []
+
+            # Get the WritingPractices
+            practices = []
+            for practice_id in practice_ids:
+                practice = session.get(WritingPractice, practice_id)
+                if practice:
+                    practices.append(practice)
+
+            return practices
+
+    def get_random_practice(self) -> Optional[WritingPractice]:
+        """Get a random WritingPractice from all practices."""
+        with Session(engine) as session:
+            statement = select(WritingPractice)
+            all_practices = list(session.exec(statement).all())
+            if not all_practices:
+                return None
+            return random.choice(all_practices)
